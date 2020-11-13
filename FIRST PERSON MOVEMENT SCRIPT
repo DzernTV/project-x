@@ -1,0 +1,60 @@
+// wie weit hoch und runter gucken
+    public float minX = -60f;
+    public float maxX = 60f;
+
+    public float sensitivity; // Geschwindigkeit der Drehung
+    public Camera cam;        // öffentliches Objekt, dass in Unity hinein gezogen werden kann. In dem Fall die Kamera.
+
+    public float speed = 12f; // Geschwindigkeit der Bewegung
+
+    public CharacterController controller; // öffentliches Objekt, dass in Unity hinein gezogen werden kann. In dem Fall die der Controller, der von Unity bereitgestellt wird
+
+    // Rotationsvariablen definieren
+    float rotY = 0f;
+    float rotX = 0f;
+
+
+
+    void Start()
+    {
+        // Beim Start des Scripts wird der Cursor unsichtbar gemacht.
+        Cursor.lockState = CursorLockMode.Locked;
+        Cursor.visible = false;
+    }
+
+    void Update()
+    {
+        // vorinstallierte Werte bekommen von den Kategorien in "", Wert gehen von 1 bis -1 (für das Movement mit w,a,s,d)
+        float x = Input.GetAxis("Horizontal");  
+        float z = Input.GetAxis("Vertical");
+
+        // Spieler bewegt sich
+        Vector3 move = transform.right * x + transform.forward * z;
+
+        // Controller bewegt sich
+        controller.Move(move * speed * Time.deltaTime);
+
+        // vorinstallierte Werte bekommen von den Kategorien in "", Wert gehen von 1 bis -1 (für die Rotation bzw. Bewegungen der Maus zu erkennen)
+        rotY += Input.GetAxis("Mouse X") * sensitivity;
+        rotX += Input.GetAxis("Mouse Y") * sensitivity;
+
+        // sorgt dafür, dass Kamera nicht das Limit der Sicht überschreitet
+        rotX = Mathf.Clamp(rotX, minX, maxX);
+
+        transform.localEulerAngles = new Vector3(0, rotY, 0);// die Rotation des Spielers
+        cam.transform.localEulerAngles = new Vector3(-rotX, rotY, 0);// Rotation der Kamera
+
+        if (Input.GetKeyDown(KeyCode.Escape))
+        {
+            // Cursor wird aktiviert, wenn Escape gedrückt
+            Cursor.lockState = CursorLockMode.None;
+            Cursor.visible = true;
+        }
+
+        if (Cursor.visible && Input.GetMouseButtonDown(1))
+        {
+            // Cursor unsichtbar
+            Cursor.lockState = CursorLockMode.Locked;
+            Cursor.visible = false;
+        }
+    }
